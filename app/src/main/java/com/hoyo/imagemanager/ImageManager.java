@@ -20,16 +20,15 @@ public abstract class ImageManager {
 
     private String case_id;
 
-    public ImageManager(Context context, String case_id) {
+    public ImageManager(Context context) {
         this.context = context;
-        this.case_id = case_id;
 
     }
 
 
-    public void StartCamera() {
+    public void StartCamera(String case_id) {
+        this.case_id = case_id;
         Camera.Parameters parameters;
-
         mCamera = Camera.open();
         SurfaceView sv = new SurfaceView(context);
 

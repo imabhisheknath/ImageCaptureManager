@@ -12,7 +12,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ImageManager imageManager = new ImageManager(MainActivity.this, "123") {
+        ImageManager imageManager = new ImageManager(MainActivity.this) {
             @Override
             public void onSuccess(String imagepath) {
                 Log.d("mypath", imagepath);
@@ -27,6 +27,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
 
-        imageManager.StartCamera();
+        imageManager.StartCamera("123");
     }
 }
