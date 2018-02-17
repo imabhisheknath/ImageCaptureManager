@@ -18,9 +18,13 @@ public abstract class MiniImageManager {
     private Context mContext;
     private Camera mCamera;
     private Parameters mParameters;
+    private ImageManagerErrorListener imageManagerErrorListener;
 
-    public abstract void onSuccess(String imagepath);
-    public abstract void onError(String msg);
+    public abstract void onImageCaptured(String imagePath);
+
+    public interface ImageManagerErrorListener {
+        void onError(String msg);
+    }
 
     public class Parameters {
         private int height;
@@ -72,6 +76,11 @@ public abstract class MiniImageManager {
         return this;
     }
 
+    public MiniImageManager setCameraListener(ImageManagerErrorListener listener){
+        this.imageManagerErrorListener = listener;
+        return this;
+    }
+
     private MiniImageManager initCamera() throws ImageManagerException {
 
         if(mParameters==null){
@@ -117,7 +126,8 @@ public abstract class MiniImageManager {
         try {
             this.initCamera();
         } catch (ImageManagerException e){
-            onError(e.toString());
+            if(imageManagerErrorListener !=null)
+                imageManagerErrorListener.onError(e.toString());
             return this;
         }
 
@@ -126,7 +136,8 @@ public abstract class MiniImageManager {
             mCamera.takePicture(null, null, mCall);
         } catch (Exception e){
             close();
-            onError("Unable to take Picture!\n"+e.toString());
+            if(imageManagerErrorListener !=null)
+                imageManagerErrorListener.onError("Unable to take Picture!\n"+e.toString());
             return this;
         }
 
@@ -168,7 +179,8 @@ public abstract class MiniImageManager {
                 String filePath = getFilePath();
 
                 if (filePath == null) {
-                    onError("Error While Creating Image File");
+                    if(imageManagerErrorListener !=null)
+                        imageManagerErrorListener.onError("Error While Creating Image File");
                     return;
                 }
 
@@ -177,15 +189,17 @@ public abstract class MiniImageManager {
                     outStream.write(data);
                     outStream.close();
                     close();
-                    onSuccess(filePath);
+                    onImageCaptured(filePath);
 
                 } catch (IOException e) {
                     Log.d("CAM", e.getMessage());
-                    onError(e.getMessage());
+                    if(imageManagerErrorListener !=null)
+                        imageManagerErrorListener.onError(e.getMessage());
                 }
 
             }catch (ImageManagerException e){
-                onError(e.toString());
+                if(imageManagerErrorListener !=null)
+                    imageManagerErrorListener.onError(e.toString());
             }
         }
     };
