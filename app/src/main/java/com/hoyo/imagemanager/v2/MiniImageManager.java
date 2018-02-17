@@ -4,6 +4,7 @@ import android.content.Context;
 import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.io.File;
@@ -93,11 +94,37 @@ public abstract class MiniImageManager {
         try {
             mCamera = Camera.open();
         } catch (Exception e){
+            Log.e("ImageManager",""+e.toString());
+
+            close();
+
+            try {
+                mCamera = Camera.open();
+            } catch (Exception e2){
+                throw new ImageManagerException("Unable to Open Camera!\n"+e2.toString());
+            }
             // ToDo - handle it here properly
-            throw new ImageManagerException("Unable to Open Camera!\n"+e.toString());
+
         }
 
         SurfaceView sv = new SurfaceView(mContext);
+        SurfaceHolder sh = sv.getHolder();
+        sh.addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+                Log.e("ImageManager","Surface created");
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+                Log.e("ImageManager","Surface changed");
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+                Log.e("ImageManager","Surface destroyed");
+            }
+        });
 
         try {
             mCamera.setPreviewDisplay(sv.getHolder());
