@@ -22,7 +22,6 @@ public abstract class ImageManager {
 
     public ImageManager(Context context) {
         this.context = context;
-
     }
 
 
