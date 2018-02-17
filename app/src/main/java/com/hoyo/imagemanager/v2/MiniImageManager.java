@@ -20,6 +20,8 @@ public abstract class MiniImageManager {
     private Camera mCamera;
     private Parameters mParameters;
     private ImageManagerErrorListener imageManagerErrorListener;
+    private SurfaceView surfaceView;
+    private SurfaceHolder surfaceHolder;
 
     public abstract void onImageCaptured(String imagePath);
 
@@ -58,6 +60,28 @@ public abstract class MiniImageManager {
 
     public MiniImageManager(Context context) {
         this.mContext = context;
+        surfaceView = new SurfaceView(mContext);
+        surfaceHolder = surfaceView.getHolder();
+        surfaceHolder.addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+                Log.e("ImageManager","Surface created");
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+                Log.e("ImageManager","Surface changed");
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+                Log.e("ImageManager","Surface destroyed");
+            }
+        });
+    }
+
+    public SurfaceView getSurfaceView() {
+        return surfaceView;
     }
 
     public MiniImageManager setupCameraParameters(String folderName){
@@ -107,27 +131,8 @@ public abstract class MiniImageManager {
 
         }
 
-        SurfaceView sv = new SurfaceView(mContext);
-        SurfaceHolder sh = sv.getHolder();
-        sh.addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder surfaceHolder) {
-                Log.e("ImageManager","Surface created");
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-                Log.e("ImageManager","Surface changed");
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-                Log.e("ImageManager","Surface destroyed");
-            }
-        });
-
         try {
-            mCamera.setPreviewDisplay(sv.getHolder());
+            mCamera.setPreviewDisplay(surfaceHolder);
             cameraParameters = mCamera.getParameters();
             // parameters.setPreviewSize(640, 480);
             cameraParameters.setPictureSize(mParameters.getWidth(),
